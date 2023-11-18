@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: blue; 
+            color: white; 
+            font-size: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            padding: 20px;
+            background-color: #fff;
+            z-index: 1;
+        }
+        input{
+            margin-bottom: 10px;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div>
+    <button onclick="showAddCustomerForm()">Add Customer</button>
+</div>
+
+<table id="customerTable">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        
+    </tbody>
+</table>
+
+<!-- Add customer screen -->
+<div id="addCustomerForm" style="display: none;">
+    <h2>Customer Details</h2>
+    <form onsubmit="addCustomer(); return false;">
+        <label for="customerName">First Name:</label>
+        <input type="text" id="customerName" required><br>
+        
+        <label for="customerLastName">Last Name:</label>
+        <input type="text" id="customerLastName" required><br>
+
+        <label for="address">Address:&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <input type="text" id="address" required><br>
+
+        <label for="city">City:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <input type="text" id="city" required><br>
+
+        <label for="state">State:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <input type="text" id="state" required><br>
+
+        <label for="email">Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <input type="email" id="email" required><br>
+
+        <label for="phoneNo">Phone No:&nbsp;</label>
+        <input type="tel" id="phoneNo" required><br>
+        
+        <button type="submit">Add Customer</button>
+    </form>
+</div>
+
+<!-- Edit customer screen -->
+<div id="editCustomerModal" class="modal">
+    <h2>Edit Customer</h2>
+    <form onsubmit="updateCustomer(); return false;">
+        <label for="editCustomerName">First Name:</label>
+        <input type="text" id="editCustomerName" required><br>
+
+        <label for="editCustomerLastName">Last Name:</label>
+        <input type="text" id="editCustomerLastName" required><br>
+
+        <label for="editAddress">Address:</label>
+        <input type="text" id="editAddress" required><br>
+        
+        <label for="editCity">City:</label>
+        <input type="text" id="editCity" required><br>
+
+        <label for="editState">State:</label>
+        <input type="text" id="editState" required><br>
+
+        <label for="editEmail">Email:</label>
+        <input type="email" id="editEmail" required><br>
+
+        <label for="editPhoneNo">Phone No:</label>
+        <input type="tel" id="editPhoneNo" required><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+    <button onclick="closeEditModal()">Cancel</button>
+</div>
+
+<script>
+    function showAddCustomerForm() {
+        document.getElementById('addCustomerForm').style.display = 'block';
+    }
+
+    function addCustomer() {
+        var customerName = document.getElementById('customerName').value;
+        var customerLastName = document.getElementById('customerLastName').value;
+        var address = document.getElementById('address').value;
+        var city = document.getElementById('city').value;
+        var state = document.getElementById('state').value;
+        var email = document.getElementById('email').value;
+        var phoneNo = document.getElementById('phoneNo').value;
+
+        var table = document.getElementById('customerTable');
+        var row = table.insertRow(-1);
+
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        var cell5 = row.insertCell(4);
+        var cell6 = row.insertCell(5);
+        var cell7 = row.insertCell(6);
+        var cell8 = row.insertCell(7);
+
+        cell1.innerHTML = customerName;
+        cell2.innerHTML = customerLastName;
+        cell3.innerHTML = address;
+        cell4.innerHTML = city;
+        cell5.innerHTML = state;
+        cell6.innerHTML = email;
+        cell7.innerHTML = phoneNo;
+        cell8.innerHTML = getActionButtons();
+
+        // Clear the form
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerLastName').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('city').value = '';
+        document.getElementById('state').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('phoneNo').value = '';
+
+        // Hide the form
+        document.getElementById('addCustomerForm').style.display = 'none';
+    }
+
+    function getActionButtons() {
+        return '<button onclick="deleteCustomer(this)" style="width: 3vw; height: 3vh; background-color: white; border: none;"><img src="https://cdn.pixabay.com/photo/2013/07/12/17/00/remove-151678_960_720.png" alt="" height="100%" width="100%" ></button> ' +
+               '<button onclick="editCustomer(this)" style="width: 3vw; height: 3vh; background-color: white; border: none;"><img src="https://static.vecteezy.com/system/resources/thumbnails/001/500/458/small/edit-icon-free-vector.jpg" alt="" height="100%" width="100%" ></button>';
+    }
+
+    function editCustomer(button) {
+        var row = button.parentNode.parentNode;
+        var customerName = row.cells[0].innerHTML;
+        var customerLastName = row.cells[1].innerHTML;
+        var address = row.cells[2].innerHTML;
+        var city = row.cells[3].innerHTML;
+        var state = row.cells[4].innerHTML;
+        var email = row.cells[5].innerHTML;
+        var phoneNo = row.cells[6].innerHTML;
+
+        // Set values in the edit modal
+        document.getElementById('editCustomerName').value = customerName;
+        document.getElementById('editCustomerLastName').value = customerLastName;
+        document.getElementById('editAddress').value = address;
+        document.getElementById('editCity').value = city;
+        document.getElementById('editState').value = state;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhoneNo').value = phoneNo;
+
+        // Store the row index in the modal for later use
+        document.getElementById('editCustomerModal').rowIndex = row.rowIndex;
+
+        // Show the edit modal
+        document.getElementById('editCustomerModal').style.display = 'block';
+    }
+
+    function updateCustomer() {
+        var customerName = document.getElementById('editCustomerName').value;
+        var customerLastName = document.getElementById('editCustomerLastName').value;
+        var address = document.getElementById('editAddress').value;
+        var city = document.getElementById('editCity').value;
+        var state = document.getElementById('editState').value;
+        var email = document.getElementById('editEmail').value;
+        var phoneNo = document.getElementById('editPhoneNo').value;
+
+        // Get the row index from the modal
+        var rowIndex = document.getElementById('editCustomerModal').rowIndex;
+
+        // Update the table with the new values
+        var table = document.getElementById('customerTable');
+        table.rows[rowIndex].cells[0].innerHTML = customerName;
+        table.rows[rowIndex].cells[1].innerHTML = customerLastName;
+        table.rows[rowIndex].cells[2].innerHTML = address;
+        table.rows[rowIndex].cells[3].innerHTML = city;
+        table.rows[rowIndex].cells[4].innerHTML = state;
+        table.rows[rowIndex].cells[5].innerHTML = email;
+        table.rows[rowIndex].cells[6].innerHTML = phoneNo;
+
+        // Hide the edit modal
+        closeEditModal();
+    }
+
+    function deleteCustomer(button) {
+        var row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function closeEditModal() {
+        document.getElementById('editCustomerModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
